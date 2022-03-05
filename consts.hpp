@@ -1,0 +1,1 @@
+constexpr double eps = 1e-7;

@@ -1,4 +1,4 @@
 *.dSYM
 .vscode
-main
 .DS_Store
+main

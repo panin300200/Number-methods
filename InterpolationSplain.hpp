@@ -1,22 +1,28 @@
-#include <fstream>
-#include <vector>
-#include <tuple>
+#pragma once
 
+#include "Splain.hpp"
+#include "constants.hpp"
+#include <algorithm>
+#include <stdexcept>
 
-using Point = std::tuple<double, double, double>;
-namespace laba1 { class InterpolationSplain; }
-
-
-class InterpolationSplain
+namespace af
 {
-	public:
+template <typename T = double> class InterpolationSplain : public af::Splain<T>
+{
+  public:
+    void update(std::vector<Point<T>> const &, std::vector<T> const &) override;
+    void readValue(Point<T> const &, SplainValue<T> &) const override;
 
-		InterpolationSplain(std::vector<Point> const& a = {}, std::vector<double> const& b = {})
-		{}
-
-
-	private:
-	// fields
-	// std::vector<double>
-	// std::vector<Point>
+  private:
+    /**
+     * @brief grid of splain points
+     */
+    std::vector<Point<T>> grid;
+    /**
+     * @brief coefficient [a, b, c, d] of cubic interpolation splain
+     */
+    std::vector<std::array<T, 4>> coefficient;
 };
+} // namespace af
+
+#include "InterpolationSplain.inl"

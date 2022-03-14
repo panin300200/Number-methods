@@ -1,4 +1,5 @@
 *.dSYM
 .vscode
 .DS_Store
+*.idea/
 main

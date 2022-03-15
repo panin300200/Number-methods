@@ -1,7 +1,7 @@
-#include "InterpolationSplain.hpp"
+#include "CubicINterpolationSplain.hpp"
 
 template <typename T>
-void af::InterpolationSplain<T>::update(std::vector<af::Point<T>> const & points, std::vector<T> const & fValues)
+void af::CubicINterpolationSplain<T>::update(std::vector<af::Point<T>> const & points, std::vector<T> const & fValues)
 {
     size_t amountSegment = points.size() - 1;
 
@@ -74,7 +74,7 @@ void af::InterpolationSplain<T>::update(std::vector<af::Point<T>> const & points
 }
 
 template <typename T>
-void af::InterpolationSplain<T>::readValue(af::Point<T> const &point, af::SplainValue<T> &result) const
+void af::CubicINterpolationSplain<T>::readValue(af::Point<T> const &point, af::SplainValue<T> &result) const
 {
 	for (size_t i = 0; i < grid.size() - 1; ++i)
 	{

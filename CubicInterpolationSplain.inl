@@ -1,7 +1,7 @@
-#include "CubicINterpolationSplain.hpp"
+#include "CubicInterpolationSplain.hpp"
 
 template <typename T>
-void af::CubicINterpolationSplain<T>::update(std::vector<af::Point<T>> const & points, std::vector<T> const & fValues)
+void af::CubicInterpolationSplain<T>::update(std::vector<af::Point<T>> const & points, std::vector<T> const & fValues)
 {
     size_t amountSegment = points.size() - 1;
 
@@ -46,8 +46,9 @@ void af::CubicINterpolationSplain<T>::update(std::vector<af::Point<T>> const & p
 
 	// to back
 	// c[amountSegment - 1] = fi[amountSegment - 2] / b[amountSegment - 2]
-	coefficient[amountSegment - 1][2] = fi[amountSegment - 2] / coefficient[amountSegment - 2][1];
-	for (size_t  i = amountSegment - 3; i < amountSegment; --i)
+	if (amountSegment)
+		coefficient[amountSegment][2] = fi[amountSegment - 1] / coefficient[amountSegment - 1][1];
+	for (size_t  i = amountSegment - 2; i < amountSegment; --i)
 	{
 		// c[i + 1] = (fi[i] - c[i + 2] * d[i]) / b[i]
 		coefficient[i + 1][2] = (fi[i] - coefficient[i + 2][2] * coefficient[i][3]) / coefficient[i][1];
@@ -56,7 +57,7 @@ void af::CubicINterpolationSplain<T>::update(std::vector<af::Point<T>> const & p
 	coefficient[0][2] = 0.;
 
 	// coefficient of splain
-	for (size_t i = 0; i < amountSegment - 1; ++i)
+	for (size_t i = 0; i < amountSegment; ++i)
 	{
         current = grid[i + 1][0] - grid[i][0];
         coefficient[i][0] = fValues[i];
@@ -66,31 +67,32 @@ void af::CubicINterpolationSplain<T>::update(std::vector<af::Point<T>> const & p
     }
 
 	// last coefficient
-	current = grid[amountSegment][0] - grid[amountSegment - 1][0];
-    coefficient[amountSegment - 1][0] = fValues[amountSegment - 1];
-    coefficient[amountSegment - 1][1] =
-		(fValues[amountSegment] - fValues[amountSegment - 1]) / current - 2. * coefficient[amountSegment - 1][2]  * current / 3.;
-    coefficient[amountSegment - 1][3] = -coefficient[amountSegment - 1][2] / current / 3.;
+	current = grid[amountSegment + 1][0] - grid[amountSegment][0];
+    coefficient[amountSegment][0] = fValues[amountSegment];
+    coefficient[amountSegment][1] =
+		(fValues[amountSegment + 1] - fValues[amountSegment]) / current - 2. * coefficient[amountSegment][2]  * current / 3.;
+    coefficient[amountSegment][3] = -coefficient[amountSegment][2] / current / 3.;
 }
 
 template <typename T>
-void af::CubicINterpolationSplain<T>::readValue(af::Point<T> const &point, af::SplainValue<T> &result) const
+void af::CubicInterpolationSplain<T>::readValue(af::Point<T> const &point, af::SplainValue<T> &result) const
 {
-	for (size_t i = 0; i < grid.size() - 1; ++i)
-	{
+    if (grid.size() <= 1) return;
+    for (size_t i = 0; i < grid.size() - 1; ++i)
+    {
 		if (point[0] > grid[i][0] && point[0] < grid[i + 1][0] ||
-			fabs(point[0] - grid[i][0]) < eps ||
-			fabs(point[0] - grid[i + 1][0]) < eps)
+			fabs(point[0] - grid[i][0]) < eps<double> ||
+			fabs(point[0] - grid[i + 1][0]) < eps<double>)
 		{
 			T distance = fabs(point[0] - grid[i][0]);
 			result[0] =
 				coefficient[i][0] + coefficient[i][1] * distance + coefficient[i][2] * distance * distance + coefficient[i][3] * distance * distance * distance;
             result[1] =
-				coefficient[i][1] + 2. * coefficient[i][2] * distance + 3. coefficient[i][3] * distance * distance;
+				coefficient[i][1] + 2. * coefficient[i][2] * distance + 3. * coefficient[i][3] * distance * distance;
             result[2] =
-				2. * coefficient[i][2] + 6. coefficient[i][3] * distance;
+				2. * coefficient[i][2] + 6. * coefficient[i][3] * distance;
 			return;
         }
 	}
-	throw std::domain_error("Point out of the domain");
+	//throw std::domain_error("Point out of the domain");
 }

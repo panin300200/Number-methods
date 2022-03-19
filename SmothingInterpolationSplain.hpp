@@ -6,12 +6,12 @@
 namespace af
 {
 template <typename T = double>
-class SmothingInterpolationSplain : public af::Splain<T>
+class SmoothingInterpolationSplain : public af::Splain<T>
 {
     public:
     {
         // constructor
-        SmothingInterpolationSplain(T parameter) : paramSmoth(parameter);
+        SmoothingInterpolationSplain(T parameter) : paramSmooth(parameter){}
         // update the splain
         void update(std::vector<Point<T>> const &, std::vector<T> const &) override;
         // get value of splain
@@ -19,14 +19,14 @@ class SmothingInterpolationSplain : public af::Splain<T>
     }
     private:
     {
-        // smothing parameter
-        T paramSmoth;
-        // grid points of smothing spline
+        // Smoothing parameter
+        T paramSmooth;
+        // grid points of Smoothing spline
         std::vector<Point<T>> grid;
         // alpha coefficcients of spline
         std::vector<T> coefficcient;
         // transfer to reference section [-1, 1]
-        void transferToMasterElement(size_t numSegment, T x, T ksi) const;
+        void transferToMasterElement(size_t numSegment, T x, T &ksi) const;
         // calculation of basis function
         T basisFunction(size_t numSegment, T ksi) const;
         // first derivate of basis function
@@ -35,4 +35,4 @@ class SmothingInterpolationSplain : public af::Splain<T>
 };
 } // namespace af
 
-include "SmothingInterpolationSplain.inl"
+include "SmoothingInterpolationSplain.inl"

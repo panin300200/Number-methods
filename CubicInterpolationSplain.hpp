@@ -4,10 +4,11 @@
 #include "constants.hpp"
 #include <algorithm>
 #include <stdexcept>
+#include <cmath>
 
 namespace af
 {
-template <typename T = double> class InterpolationSplain : public af::Splain<T>
+template <typename T = double> class CubicInterpolationSplain : public af::Splain<T>
 {
   public:
     void update(std::vector<Point<T>> const &, std::vector<T> const &) override;
@@ -25,4 +26,4 @@ template <typename T = double> class InterpolationSplain : public af::Splain<T>
 };
 } // namespace af
 
-#include "InterpolationSplain.inl"
+#include "CubicInterpolationSplain.inl"

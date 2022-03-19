@@ -8,7 +8,8 @@ namespace af
 template <typename T = double> using Point = std::array<T, 3>;
 template <typename T = double> using SplainValue = Point<T>;
 
-template <typename T = double> class Splain
+template <typename T = double> 
+class Splain
 {
   public:
     /**

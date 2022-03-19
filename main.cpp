@@ -18,8 +18,8 @@ int main()
         splain.update(grid, fValues);
 
         af::SplainValue<double> result;
-        splain.readValue(af::Point<double>{3}, result);
-        std::cout << "f(5) = " << result[0] << '\n';
+        splain.readValue(af::Point<double>{2.5}, result);
+        std::cout << "f(2.5) = " << result[0] << '\n';
         std::cin.get();
     }
     catch (std::domain_error ex)

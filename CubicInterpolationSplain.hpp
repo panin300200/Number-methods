@@ -8,7 +8,8 @@
 
 namespace af
 {
-template <typename T = double> class CubicInterpolationSplain : public af::Splain<T>
+template <typename T = double> 
+class CubicInterpolationSplain : public af::Splain<T>
 {
   public:
     void update(std::vector<Point<T>> const &, std::vector<T> const &) override;

@@ -6,7 +6,7 @@ int main()
 {
     try
     {
-        std::vector grid{
+        std::vector<af::Point<double>> grid{
             af::Point<double>{},
             af::Point<double>{1.},
             af::Point<double>{3.},
@@ -14,7 +14,7 @@ int main()
         };
         std::vector<double> fValues{0., 1., 3., 7.};
 
-        af::CubicInterpolationSplain splain;
+        af::CubicInterpolationSplain<double> splain;
         splain.update(grid, fValues);
 
         af::SplainValue<double> result;

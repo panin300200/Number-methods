@@ -5,11 +5,12 @@ void af::CubicInterpolationSplain<T>::update(std::vector<af::Point<T>> const & p
 {
     size_t amountSegment = points.size() - 1;
 
-    this->grid.resize(amountSegment + 1);
+	if (!amountSegment) return;
+
+	this->grid.resize(amountSegment + 1);
 	std::copy(points.begin(), points.end(), grid.begin());
 
     coefficient.resize(amountSegment);
-	if (!amountSegment) return;
 
 	T current{}, next{}; // h (step)
     std::vector<T> fi(--amountSegment); // --amountSegment
@@ -69,30 +70,25 @@ void af::CubicInterpolationSplain<T>::update(std::vector<af::Point<T>> const & p
 	// last coefficient
 	current = grid[amountSegment + 1][0] - grid[amountSegment][0];
     coefficient[amountSegment][0] = fValues[amountSegment];
-    coefficient[amountSegment][1] =
-		(fValues[amountSegment + 1] - fValues[amountSegment]) / current - 2. * coefficient[amountSegment][2]  * current / 3.;
+    coefficient[amountSegment][1] = (fValues[amountSegment + 1] - fValues[amountSegment]) / current - 2. * coefficient[amountSegment][2]  * current / 3.;
     coefficient[amountSegment][3] = -coefficient[amountSegment][2] / current / 3.;
 }
 
 template <typename T>
-void af::CubicInterpolationSplain<T>::readValue(af::Point<T> const &point, af::SplainValue<T> &result) const
+af::SplainValue<T> af::CubicInterpolationSplain<T>::getValue(af::Point<T> const &point) const
 {
-    if (grid.size() <= 1) return;
+    if (grid.size() <= 1) return {};
     for (size_t i = 0; i < grid.size() - 1; ++i)
     {
 		if (point[0] > grid[i][0] && point[0] < grid[i + 1][0] ||
-			fabs(point[0] - grid[i][0]) < eps<double> ||
-			fabs(point[0] - grid[i + 1][0]) < eps<double>)
+			fabs(point[0] - grid[i][0]) < eps<T> ||
+			fabs(point[0] - grid[i + 1][0]) < eps<T>)
 		{
 			T distance = fabs(point[0] - grid[i][0]);
-			result[0] =
-				coefficient[i][0] + coefficient[i][1] * distance + coefficient[i][2] * distance * distance + coefficient[i][3] * distance * distance * distance;
-            result[1] =
-				coefficient[i][1] + 2. * coefficient[i][2] * distance + 3. * coefficient[i][3] * distance * distance;
-            result[2] =
-				2. * coefficient[i][2] + 6. * coefficient[i][3] * distance;
-			return;
+			return {coefficient[i][0] + coefficient[i][1] * distance + coefficient[i][2] * distance * distance + coefficient[i][3] * distance * distance * distance,
+					coefficient[i][1] + 2. * coefficient[i][2] * distance + 3. * coefficient[i][3] * distance * distance,
+					2. * coefficient[i][2] + 6. * coefficient[i][3] * distance};
         }
 	}
-	//throw std::domain_error("Point out of the domain");
+	throw std::domain_error("Point out of the domain");
 }

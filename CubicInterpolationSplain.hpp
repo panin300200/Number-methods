@@ -13,7 +13,7 @@ class CubicInterpolationSplain : public af::Splain<T>
 {
   public:
     void update(std::vector<Point<T>> const &, std::vector<T> const &) override;
-    void readValue(Point<T> const &, SplainValue<T> &) const override;
+    SplainValue<T> getValue(Point<T> const &) const override;
 
   private:
     /**

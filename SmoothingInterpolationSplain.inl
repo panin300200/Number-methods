@@ -1,36 +1,30 @@
 #include "SmoothingInterpolationSplain.hpp"
 
 template <typename T>
-void af::SmoothingInterpolationSplain<T>::transferToMasterElement(size_t numSegment, T x, T &ksi) const {
-    ksi = 2. * (x - grid[numSegment][0]) / (grid[numSegment + 1][0] - grid[numSegment][0]) - 1.;
+T af::SmoothingInterpolationSplain<T>::transferToMasterElement(size_t numSegment, T x) const 
+{
+    return 2. * (x - grid[numSegment][0]) / (grid[numSegment + 1][0] - grid[numSegment][0]) - 1.;
 }
 
 template <typename T>
-T af::SmoothingInterpolationSplain<T>::basisFunction(size_t numSegment, T ksi) const {
-    switch (numSegment) {
-        case 1:
-            return 0.5 * (1 - ksi);
-
-        case 2:
-            return 0.5 * (1 + ksi);
-
-        default:
-            throw std::exception("There is a problem with the base function number!");
-
+T af::SmoothingInterpolationSplain<T>::basisFunction(size_t numSegment, T ksi) const 
+{
+    switch (numSegment) 
+    {
+        case 1: return 0.5 * (1 - ksi);
+        case 2: return 0.5 * (1 + ksi);
+        default: throw std::invalid_argument("There is a problem with the base function number!");
     }
 }
 
 template <typename T>
-T af::SmoothingInterpolationSplain<T>::derivBasisFunction(size_t numSegment, T ksi) const {
-    switch (numSegment) {
-        case 1:
-            return -0.5;
-
-        case 2:
-            return 0.5;
-
-        default:
-            throw std::exception("There is a problem with the base function derivative number!");
+T af::SmoothingInterpolationSplain<T>::derivBasisFunction(size_t numSegment) const 
+{
+    switch (numSegment) 
+    {
+        case 1: return -0.5;
+        case 2: return 0.5;
+        default: throw std::invalid_argument("There is a problem with the base function derivative number!");
     }
 }
 
@@ -39,10 +33,10 @@ void af::SmoothingInterpolationSplain<T>::update(std::vector<af::Point<T>> const
 {
     size_t amountSegment = points.size() - 1;
 
-    this->grid.resize(amountSegment + 1);
-
-    coefficcient.resize(amountSegment + 1);
     if (!amountSegment) return;
+
+    grid.resize(amountSegment + 1);
+    coefficcient.resize(amountSegment + 1);
 
     std::copy(points.begin(), points.end(), grid.begin());
 
@@ -53,14 +47,11 @@ void af::SmoothingInterpolationSplain<T>::update(std::vector<af::Point<T>> const
     // lambda-function of assembling
     auto assembling = [&](size_t i, Point<T> const &point, T fVal, T weight)
     {
-        T x = point[0], ksi;
-
-        // go to master element
-        this->transferToMasterElement(i, x, ksi);
+        T ksi = transferToMasterElement(i, point[0]);
 
         // date of basis functions
-        T fi1 = this->basisFunction(1, ksi);
-        T fi2 = this->basisFunction(2, ksi);
+        T fi1 = basisFunction(1, ksi);
+        T fi2 = basisFunction(2, ksi);
 
         // calculate diagonals
         auto coef = (1. - paramSmooth) * weight;
@@ -74,21 +65,18 @@ void af::SmoothingInterpolationSplain<T>::update(std::vector<af::Point<T>> const
         diagonal[2][i]     += coef * fi2 * fi1;
 
         // calculate alpha coefficcients
-        coefficcient[i]    += coef * fi1 * fVal;
+        coefficcient[i]     += coef * fi1 * fVal;
         coefficcient[i + 1] += coef * fi2 * fVal;
     };
 
     for (size_t i(0); i < amountSegment; i++)
     {
         // coefficcient of weight
-        T w = 1.;
-        assembling(i, this->grid[i], fValues[i], w);
-        assemblling(i, this->grid[i+1], fValues[i + 1], w);
+        assembling(i, grid[i], fValues[i], 1.);
+        assemblling(i, grid[i+1], fValues[i + 1], 1.);
 
-        // contribution using first derivative
-        T h = grid[i + 1][0] - grid[i][0];
         // usefull coefficcient
-        auto beta = 1./ h * paramSmooth;
+        auto beta = 1./ (grid[i + 1][0] - grid[i][0]) * paramSmooth;
         // b[i]
         diagonal[1][i]     += beta;
         // b[i+1]
@@ -102,43 +90,41 @@ void af::SmoothingInterpolationSplain<T>::update(std::vector<af::Point<T>> const
     // go to forward
     for (size_t i(1); i < amountSegment + 1; i++)
     {
+        auto buf = diagonal[0][i] / diagonal[1][i - 1];
         // b[i]
-        diagonal[1][i]  -= diagonal[0][i] / diagonal[1][i - 1] * diagonal[2][i - 1];
+        diagonal[1][i]  -= buf * diagonal[2][i - 1];
         // alpha[i]
-        coefficcient[i] -= diagonal[0][i] / diagonal[1][i - 1] * coefficcient[i - 1];
+        coefficcient[i] -= buf * coefficcient[i - 1];
     }
 
     //alpha[amountSegment] /= b[amountSegment]
     coefficcient[amountSegment] /= diagonal[1][amountSegment];
     //go to back
-    for (int i(amountSegment - 1); i >= 0; --i)
+    for (size_t i(amountSegment - 1); i < amountSegment ; --i)
         // alpha[i] = (alpha[i] - alpha[i+1] * c[i]) / b[i]
         coefficcient[i] = (coefficcient[i] - coefficcient[i + 1] * diagonal[2][i]) / diagonal[1][i];
 }
 
 template <typename T>
-void af::SmoothingInterpolationSplain<T>::readValue(const Point<T> & point, SplainValue<T> & result) const {
-
+af::SplainValue<T> af::SmoothingInterpolationSplain<T>::getValue(const af::Point<T> & point) const 
+{
+    if (!grid.size()) return {};
+    
     size_t amountSegment = grid.size() - 1;
 
-    T x = point[0];
-
-    for(size_t i = 0; i < amountSegment; i++){
-        if((x > grid[i][0] && x < grid[i + 1][0]) || fabs(x - grid[i][0]) < eps<T> || fabs(x - grid[i + 1][0]) < eps<T>)
+    for(size_t i = 0; i < amountSegment; i++)
+    {
+        if((point[0] > grid[i][0] 
+            && point[0] < grid[i + 1][0]) 
+            || fabs(point[0] - grid[i][0]) < eps<T> 
+            || fabs(point[0] - grid[i + 1][0]) < eps<T>)
         {
-            T lenght = grid[i + 1][0] - grid[i][0];
+            T ksi = transferToMasterElement(i, point[0]);
 
-            T ksi;
-            af::SmoothingInterpolationSplain<T>::transferToMasterElement(i, x, ksi);
-
-            result[0] = coefficcients[i]     * basisFunction(1, ksi) +
-                        coefficcients[i + 1] * basisFunction(2, ksi);
-            result[1] = (coefficcients[i]    * basisFunction(1, ksi) +
-                        coefficcients[i + 1] * basisFunction(2, ksi)) * 2. / lenght;
-            result[2] = 0.;
-            return;
+            return{coefficcients[i] * basisFunction(1, ksi) + coefficcients[i + 1] * basisFunction(2, ksi),
+                   (coefficcients[i] * basisFunction(1, ksi) + coefficcients[i + 1] * basisFunction(2, ksi)) * 2. / (grid[i + 1][0] - grid[i][0]), 
+                   0.};
         }
     }
-
-    throw std::exception("Point not found on segments!");
+    throw std::domain_error("Point not found on segments!");
 }

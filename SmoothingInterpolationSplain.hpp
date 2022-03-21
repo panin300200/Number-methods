@@ -17,11 +17,11 @@ class SmoothingInterpolationSplain : public af::Splain<T>
         // alpha coefficcients of spline
         std::vector<T> coefficcient;
         // transfer to reference section [-1, 1]
-        void transferToMasterElement(size_t numSegment, T x, T &ksi) const;
+        T transferToMasterElement(size_t numSegment, T x) const;
         // calculation of basis function
         T basisFunction(size_t numSegment, T ksi) const;
         // first derivate of basis function
-        T derivBasisFunction(size_t numSegment, T ksi) const;
+        T derivBasisFunction(size_t numSegment) const;
 
     public:
         // constructor
@@ -29,7 +29,7 @@ class SmoothingInterpolationSplain : public af::Splain<T>
         // update the splain
         void update(std::vector<Point<T>> const &, std::vector<T> const &) override;
         // get value of splain
-        void readValue(const Point <T> &point, SplainValue <T> &result) const override;
+        SplainValue<T> getValue(const Point <T> &point) const override;
 };
 } // namespace af
 

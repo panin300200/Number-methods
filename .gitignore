@@ -1,0 +1,13 @@
+#vscode
+*.dSYM
+.vscode
+main
+
+#cmake
+.build
+
+#macOS
+.DS_Store
+
+#unused direction
+Аппроксимация функций исходный код

@@ -1,30 +1,40 @@
-#include "CubicInterpolationSplain.hpp"
-#include "spliting.hpp"
+#include "Splain/createTableCSV.hpp"
+#include "interface/CLI.hpp"
 #include <iostream>
 
-int main()
+int main(int argc, char* argv[])
 {
     try
     {
-        std::vector grid{
-            af::Point<double>{},
-            af::Point<double>{1.},
-            af::Point<double>{3.},
-            af::Point<double>{7.}
-        };
-        std::vector<double> fValues{0., 1., 3., 7.};
+        NoArg<double> noArg; OneArg<double> oneArg;
+        for (int i = 1; i < argc; ++i)
+        {
+            if (auto f{menuPrint<double>.find(argv[i])}; f != menuPrint<double>.end())
+                f->second(noArg);
+            else if (auto f{menuSet<double>.find(argv[i])};
+                     f != menuSet<double>.end())
+                if (++i < argc)
+                    f->second(oneArg, argv[i]);
+                else
+                    throw std::runtime_error("Invalid option arguments.\n");
+            else
+                throw std::runtime_error("Invalid option use option -h|-help for more info\n");
+        }
+        noArg.print();
 
-        af::CubicInterpolationSplain splain;
-        splain.update(grid, fValues);
+        double a{oneArg.aValue}, b{oneArg.bValue};
+        size_t amount{oneArg.segmentsAmount};
+        while (a >= b || amount < 2 || amount >= maxAmountStrings)
+        {
+            std::cout << "input [a, b] (must: a < b) and separate amount (>= 10 && < 349 524): ";
+            std::cin >> a >> b >> amount;
+        }
 
-        af::SplainValue<double> result;
-        splain.readValue(af::Point<double>{3}, result);
-        std::cout << "f(5) = " << result[0] << '\n';
-        std::cin.get();
+        createTableCSV<double>(a, b, amount, {1., 0.5, 0.25}, oneArg.path);
     }
-    catch (std::domain_error ex)
+    catch (std::exception const &ex)
     {
-        std::cout << ex.what() << std::endl;
+        std::cerr << ex.what() << std::endl;
     }
     return 0;
 }

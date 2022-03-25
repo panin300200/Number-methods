@@ -35,7 +35,7 @@ make
 ```
 mv ./splain* {comfortable path}
 ```
-## On conclusion:
+## In conclusion:
 You can clear temp:
 ```
 cd ../

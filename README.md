@@ -3,7 +3,7 @@ Hello! The project make labaratory number one of number methods by NSTU. Our tea
 You can build and run our program on your machine. There is tutorial below.
 ## How run Splain
 ### Step 1: git clone
-That have ordenary folders do:
+Take it for you convenience:
 ```
 mkdir test
 cd test
@@ -14,7 +14,9 @@ git clone "https://github.com/panin300200/Number-methods.git"
 ```
 ### Step 2: use cmake
 Install cmake.
-On windows use this links (guid) : https://aneescraftsmanship.com/how-to-install-and-configure-cmake-in-windows/
+
+On windows use this links (guide) : https://aneescraftsmanship.com/how-to-install-and-configure-cmake-in-windows/
+
 On macOS:
 ```
 brew install cmake
@@ -25,14 +27,15 @@ sudo apt-get install cmake
 ```
 ## Step 3: build
 ```
-cmake -G"Unix Makefiles" .
+cd Number methods
+cmake -G "Unix Makefiles" .
 make
 ```
-## Step 4: save to comfortabel folder
+## Step 4: you can move it wherever you want
 ```
-mv ./splain* {comfortabel path}
+mv ./splain* {comfortable path}
 ```
-## In conclustion:
+## On conclusion:
 You can clear temp:
 ```
 cd ../

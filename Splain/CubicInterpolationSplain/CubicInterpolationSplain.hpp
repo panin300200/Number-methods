@@ -4,7 +4,6 @@
 #include "../../constants.hpp"
 #include <algorithm>
 #include <cmath>
-#include <stdexcept>
 
 namespace af
 {

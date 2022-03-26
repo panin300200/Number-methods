@@ -8,8 +8,7 @@ void af::CubicInterpolationSplain<T>::update(std::vector<af::Point<T>> const &po
     if (amountSegment-- <= 1)
         throw std::invalid_argument("A few amount of point!");
 
-    this->grid.resize(amountSegment + 1);
-    std::copy(points.begin(), points.end(), grid.begin());
+    grid = points;
 
     coefficient.resize(amountSegment);
 
@@ -31,7 +30,7 @@ void af::CubicInterpolationSplain<T>::update(std::vector<af::Point<T>> const &po
         // d[i] = next
         coefficient[i][3] = next;
 
-        fi[i] = 3. * ((fValues[i + 2] - fValues[i + 1]) / next - (fValues[i + 1] - fValues[i]) / current);
+        fi[i] = T(3.) * ((fValues[i + 2] - fValues[i + 1]) / next - (fValues[i + 1] - fValues[i]) / current);
     }
 
     // to forward
@@ -65,10 +64,10 @@ void af::CubicInterpolationSplain<T>::update(std::vector<af::Point<T>> const &po
         coefficient[i][0] = fValues[i];
         // b[i] = (fValues[i + 1] / fValues[i]) / current - (c[i + 1] + 2 * c[i]) * current / 3
         coefficient[i][1] =
-            (fValues[i + 1] - fValues[i]) / current - (coefficient[i + 1][2] + 2. * coefficient[i][2]) * current / 3.;
+            (fValues[i + 1] - fValues[i]) / current - (coefficient[i + 1][2] + T(2.) * coefficient[i][2]) * current / T(3.);
         // d[i] = (c[i + 1] - c[i]) / (current * 3)
         coefficient[i][3] =
-            (coefficient[i + 1][2] - coefficient[i][2]) / (current * 3.);
+            (coefficient[i + 1][2] - coefficient[i][2]) / (current * T(3.));
     }
 
     // last coefficient
@@ -77,12 +76,13 @@ void af::CubicInterpolationSplain<T>::update(std::vector<af::Point<T>> const &po
     coefficient[amountSegment - 1][0] = fValues[amountSegment - 1];
     // b[i] = (fValues[i + 1] / fValues[i]) / current - (c[i + 1] + 2 * c[i]) * current / 3
     coefficient[amountSegment - 1][1] = (fValues[amountSegment] - fValues[amountSegment - 1]) / current -
-                                    2. * coefficient[amountSegment - 1][2] * current / 3.;
+                                    T(2.) * coefficient[amountSegment - 1][2] * current / T(3.);
     // d[i] = (c[i + 1] - c[i]) / (current * 3)
-    coefficient[amountSegment - 1][3] = -coefficient[amountSegment - 1][2] / (current * 3.);
+    coefficient[amountSegment - 1][3] = -coefficient[amountSegment - 1][2] / (current * T(3.));
 }
 
-template <typename T> af::SplainValue<T> af::CubicInterpolationSplain<T>::getValue(af::Point<T> const &point) const
+template <typename T>
+af::SplainValue<T> af::CubicInterpolationSplain<T>::getValue(af::Point<T> const &point) const
 {
     size_t amountSegment = grid.size();
     if (amountSegment-- <= 1)
@@ -98,9 +98,9 @@ template <typename T> af::SplainValue<T> af::CubicInterpolationSplain<T>::getVal
             return  {
                         coefficient[i][0] + coefficient[i][1] * distance + coefficient[i][2] * distance * distance + coefficient[i][3] * distance * distance * distance,
 
-                        coefficient[i][1] + 2. * coefficient[i][2] * distance + 3. * coefficient[i][3] * distance * distance,
+                        coefficient[i][1] + T(2.) * coefficient[i][2] * distance + T(3.) * coefficient[i][3] * distance * distance,
 
-                        2. * coefficient[i][2] + 6. * coefficient[i][3] * distance
+                        T(2.) * coefficient[i][2] + T(6.) * coefficient[i][3] * distance
                     };
         }
     }

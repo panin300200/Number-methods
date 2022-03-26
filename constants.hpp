@@ -14,8 +14,11 @@ constexpr T eps{T(1e-15)};
 constexpr auto maxAmountStrings{349'524ul};
 
 template <typename T = double>
-const std::initializer_list<std::pair<std::string,
-									  std::array<std::function<T(T)>,3>>> functions
+using function_type = std::initializer_list<std::pair<std::string,
+									  std::array<std::function<T(T)>,3>>>;
+
+template <typename T = double>
+function_type<T> functions
 {
     {
 		std::string("Table of f(x) = x"),
@@ -60,6 +63,15 @@ const std::initializer_list<std::pair<std::string,
 			[](T x) { return std::sin(x); },
 			[](T x) { return std::cos(x); },
 			[](T x) { return -std::sin(x);}
+		}
+	},
+	{
+		std::string("Table of f(x) = x|sin(10000x)|"),
+		std::array<std::function<T(T)>,3>
+		{
+			[](T x) { return x * fabs(std::sin(10000 * x)); },
+			[](T)   { return 0; },
+			[](T)	{ return 0; }
 		}
 	}
 };

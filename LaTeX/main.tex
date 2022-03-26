@@ -1,0 +1,42 @@
+\documentclass{article}
+
+\usepackage{ucs}
+\usepackage[utf8x]{inputenc}	% enable utf8
+\usepackage[russian]{babel}		% enable russian language
+\usepackage[left=1.7cm,right=1.7cm,top=2cm,bottom=2cm,bindingoffset=0cm]{geometry}
+\usepackage{mathtools}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{color}
+
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+
+\lstset {
+    language=C++,
+    backgroundcolor=\color{white}, % set backgroundcolor
+    basicstyle=\footnotesize, % basic font setting
+    captionpos=b, % sets the caption-position to bottom
+    extendedchars=\true,
+    numbers=left,
+    stepnumber=1,
+    showstringspaces=false,
+    breaklines=true,
+    commentstyle=\color{mygreen},    % comment style
+    escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
+    keywordstyle=\color{blue},       % keyword style
+    stringstyle=\color{mymauve},     % string literal style
+    basicstyle=\linespread{1.2},
+	tabsize=4,
+}
+
+\title{Labaratory №2}
+\date{}
+\author{Beernadsky Gregory, Komarik Zakhar, Shnaider Ksenia}
+
+\begin{document}
+\maketitle
+\input{tasks.tex}
+\input{solution.tex}
+\end{document}

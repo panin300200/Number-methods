@@ -15,7 +15,7 @@ std::array<T, 3> getDerivatives(T x, std::array<std::function<T(T)>,3> const &F)
 }
 
 template <typename T = double>
-void createTableCSV(T a, T b, size_t amount, std::vector<T> const &steps, T r, function_type<T> const& functions, std::string const& path = "")
+void createTableCSV(T a, T b, size_t amount, std::vector<T> const &steps, function_type<T> const& functions, std::string const& path = "")
 {
     for (auto &function : functions)
     {
@@ -25,8 +25,8 @@ void createTableCSV(T a, T b, size_t amount, std::vector<T> const &steps, T r, f
         {
             auto grid{af::createGrid(a, b, amount, step)};
 
-            af::CubicInterpolationSplain splainCubic;
-            af::SmoothingInterpolationSplain splainSmooth;
+            af::CubicInterpolationSplain<T> splainCubic;
+            af::SmoothingInterpolationSplain<T> splainSmooth{.9};
             {
                 std::vector<af::Point<T>> points(grid.size());
                 std::vector<T> fTable(grid.size());
@@ -85,51 +85,53 @@ void createTableCSV(T a, T b, size_t amount, std::vector<T> const &steps, T r, f
                     ",,max|F`(x) - S2`(x)|= " << std::max(skew2[1], fabs(f[1] - s2[1])) << ",,," <<
                     "max|F``(x) - S1``(x)|= " << std::max(skew1[2], fabs(f[2] - s1[2])) << ',' << ",,max|F``(x) - S2``(x)|= " << std::max(skew2[2], fabs(f[2] - s2[2])) << "\n\n\n";
         }
-
-        // // ununiform step
-        // auto grid{af::spliting<T>(b, a, amount, function.second, r)};
-        // af::CubicInterpolationSplain splain;
-        // {
-        //     std::vector<T> fValues;
-        //     fValues.reserve(grid.size());
-        //     for (const auto& point : grid)
-        //         fValues.emplace_back(point[0]);
-
-        //     splain.update(grid, fValues);
-        // }
-
-        // file << function.first <<
-        //     "\nr = " << r <<
-        //     "\nx,F(x),S(x),,,x,F(x)`,S(x)`,,,x,F(x)``,S(x)``\n";
-        // auto maxUncertainty = std::vector<T>(3, 0);
-        // for (size_t j{}; j < grid.size() - 1; ++j)
-        // {
-        //     auto newGrid{af::spliting(function.second, grid[j][0], grid[j + 1][0], amount)};
-        //     for (size_t i{}; i < newGrid.size() - 1; ++i)
-        //     {
-        //         auto result = splain.getValue({newGrid[i][0]});
-        //         file <<
-        //             newGrid[i][0] << ',' << function.second[0](newGrid[i][0]) << ',' << result[0] << ",,," <<
-        //             newGrid[i][0] << ',' << newGrid[i][1] << ',' << result[1] << ",,," <<
-        //             newGrid[i][0] << ',' << newGrid[i][2] << ',' << result[2] << '\n';
-        //         maxUncertainty =
-        //         {
-        //             std::max(maxUncertainty[0], fabs(result[0] - function.second[0](newGrid[i][0]))),
-        //             std::max(maxUncertainty[1], fabs(result[1] - newGrid[i][1])),
-        //             std::max(maxUncertainty[2], fabs(result[2] - newGrid[i][2]))
-        //         };
-        //     }
-        // }
-        // auto result = splain.getValue({grid.back()[0]});
-        // file << grid.back()[0] << ',' << function.second[0](grid.back()[0]) << ',' << result[0] << ",,,"
-        //      << grid.back()[0] << ',' << grid.back()[1] << ',' << result[1] << ",,,"
-        //      << grid.back()[0] << ',' << grid.back()[2] << ',' << result[2] << '\n';
-        // maxUncertainty = {std::max(maxUncertainty[0], fabs(result[0] - function.second[0](grid.back()[0]))),
-        //                   std::max(maxUncertainty[1], fabs(result[1] - grid.back()[1])),
-        //                   std::max(maxUncertainty[2], fabs(result[2] - grid.back()[2]))};
-        // file << "max|F(x) - S(x)|= " << maxUncertainty[0] << ",,,,,"
-        //      << "max|F`(x) - S`(x)|= " << maxUncertainty[1] << ",,,,,"
-        //      << "max|F``(x) - S``(x)|= " << maxUncertainty[2] << "\n\n\n";
         file.close();
     }
 }
+
+//* ununiform step
+// auto grid{af::spliting<T>(a, b, amount, r)};
+// af::CubicInterpolationSplain splain;
+// {
+//     std::vector<af::Point<T>> points(grid.size());
+//     std::vector<T> fValues(grid.size());
+//     for (size_t i{}; i < grid.size(); ++i)
+//     {
+//         points[i] = {grid[i]};
+//         fValues[i] = function.second[0](grid[i]);
+//     }
+//     splain.update(points, fValues);
+// }
+
+// file << function.first <<
+//     "\nr = " << r <<
+//     "\nx,F(x),S(x),,,x,F(x)`,S(x)`,,,x,F(x)``,S(x)``\n";
+// auto skew{std::array<T, 3>{}};
+// for (size_t j{}; j < grid.size() - 1; ++j)
+// {
+//     auto x{af::spliting(grid[j], grid[j + 1], amount, r)};
+//     for (size_t i{}; i < x.size() - 1; ++i)
+//     {
+//         auto s{splain.getValue({x[i]})};
+//         auto f{getDerivatives(x[i], function.second)};
+//         file <<
+//             x[i] << ',' << f[0] << ',' << s[0] << ",,," <<
+//             x[i] << ',' << f[0] << ',' << s[1] << ",,," <<
+//             x[i] << ',' << f[0] << ',' << s[2] << '\n';
+//         skew =
+//         {
+//             std::max(skew[0], fabs(f[0] - s[0])),
+//             std::max(skew[1], fabs(f[0] - s[0])),
+//             std::max(skew[2], fabs(f[0] - s[0]))
+//         };
+//     }
+// }
+// auto s{splain.getValue({grid.back()})};
+// auto f{getDerivatives(grid.back(), function.second)};
+// file <<
+//     grid.back() << ',' << f[0] << ',' << s[0] << ",,," <<
+//     grid.back() << ',' << f[0] << ',' << s[1] << ",,," <<
+//     grid.back() << ',' << f[0] << ',' << s[2] << '\n' <<
+//     "max|F(x) - S(x)|= " << std::max(skew[0], fabs(f[0] - s[0])) << ",,,,," <<
+//     "max|F`(x) - S`(x)|= " << std::max(skew[0], fabs(f[1] - s[1])) << ",,,,," <<
+//     "max|F``(x) - S``(x)|= " << std::max(skew[0], fabs(f[2] - s[2]));

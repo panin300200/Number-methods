@@ -110,13 +110,13 @@ af::SplainValue<T> af::SmoothingInterpolationSplain<T>::getValue(const af::Point
     if (amountSegment-- <= 1)
         throw std::invalid_argument("Grid is so small");
 
-    for(size_t i{}; i < amountSegment; i++)
+    for (size_t i{}; i < amountSegment; i++)
     {
         if(point[0] > grid[i][0] && point[0] < grid[i + 1][0] ||
             fabs(point[0] - grid[i][0]) < eps<T> ||
             fabs(point[0] - grid[i + 1][0]) < eps<T>)
         {
-            T ksi = transferToMasterElement(i, point[0]);
+            T ksi{transferToMasterElement(i, point[0])};
 
             return
             {

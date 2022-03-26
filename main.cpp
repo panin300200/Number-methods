@@ -30,7 +30,7 @@ int main(int argc, char* argv[])
             std::cin >> a >> b >> amount;
         }
 
-        createTableCSV<double>(a, b, amount, {1., .5, .25}, 1.5, functions<double>, oneArg.path);
+        createTableCSV<double>(a, b, amount, {1., .5, .25}, functions<double>, oneArg.path);
     }
     catch (std::exception const &ex)
     {

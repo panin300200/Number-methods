@@ -22,12 +22,9 @@ constexpr T af::SmoothingInterpolationSplain<T>::derivBasisFunction(size_t numSe
 {
     switch (numSegment)
     {
-    case 1:
-        return -0.5;
-    case 2:
-        return 0.5;
-    default:
-        throw std::invalid_argument("There is a problem with the base function derivative number!");
+        case 1: return -0.5;
+        case 2: return  0.5;
+        default: throw std::invalid_argument("There is a problem with the base function derivative number!");
     }
 }
 

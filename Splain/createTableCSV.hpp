@@ -15,9 +15,9 @@ std::array<T, 3> getDerivatives(T x, std::array<std::function<T(T)>,3> const &F)
 }
 
 template <typename T = double>
-void createTableCSV(T a, T b, size_t amount, std::vector<T> const &steps, T r, std::string const& path = "")
+void createTableCSV(T a, T b, size_t amount, std::vector<T> const &steps, T r, function_type<T> const& functions, std::string const& path = "")
 {
-    for (auto &function : functions<T>)
+    for (auto &function : functions)
     {
         std::ofstream file(path + function.first + ".csv", std::ios::out);
         // uniform step

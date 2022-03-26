@@ -5,9 +5,11 @@ main
 
 #cmake
 .build
+build
 
 #macOS
 .DS_Store
 
 #unused direction
 Аппроксимация функций исходный код
+*.csv

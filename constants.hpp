@@ -7,7 +7,7 @@
 #include <cmath>
 
 template <typename T = double>
-constexpr T eps{T(1e-16)};
+constexpr T eps{T(1e-15)};
 
 //? 1'048'576 - max amount strings for csv
 //* (1'048'576 - 4) / 3 = 349'524

@@ -16,7 +16,7 @@ template <typename T = double> class Splain
     Splain()
     {
       if (!std::is_floating_point<T>::value)
-        throw std::logic_error("For normal work use floating types : float, double, long double\n");
+        throw std::logic_error("For normal work use floating types : float, double, long double");
     }
     /**
      * first is anchor points

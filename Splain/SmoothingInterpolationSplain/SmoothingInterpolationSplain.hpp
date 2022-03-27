@@ -7,31 +7,28 @@ namespace af
 {
 template <typename T = double> class SmoothingInterpolationSplain : public af::Splain<T>
 {
-  private:
     // transfer to reference section [-1, 1]
-    T transferToMasterElement(size_t numSegment, T x) const;
+    inline constexpr T transferToMasterElement(size_t, T) const noexcept;
     // calculation of basis function
-    T basisFunction(size_t numSegment, T ksi) const;
-    // first derivate of basis function
-    T derivBasisFunction(size_t numSegment) const;
+    static inline constexpr T basisFunction(size_t, T);
+    // TODO: comment
+    static inline constexpr T derivBasisFunction(size_t);
 
   public:
     // constructor
-    SmoothingInterpolationSplain(T parameter)
-		: paramSmooth(parameter)
-    {}
+    SmoothingInterpolationSplain(T p = 0.) : smooth(p) {}
     // update the splain
     void update(std::vector<Point<T>> const &, std::vector<T> const &) override;
     // get value of splain
-    SplainValue<T> getValue(const Point<T> &point) const override;
+    SplainValue<T> getValue(const Point<T> &) const override;
 
   private:
     // Smoothing parameter
-    T paramSmooth;
+    T smooth;
     // grid points of Smoothing spline
     std::vector<Point<T>> grid;
     // alpha coefficcients of spline
-    std::vector<T> coefficcient;
+    std::vector<T> a;
 };
 } // namespace af
 

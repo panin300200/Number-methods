@@ -16,9 +16,9 @@ int main(int argc, char* argv[])
                 if (++i < argc)
                     f->second(oneArg, argv[i]);
                 else
-                    throw std::runtime_error("Invalid option arguments.\n");
+                    throw std::runtime_error("Invalid option arguments.");
             else
-                throw std::runtime_error("Invalid option use option -h|-help for more info\n");
+                throw std::runtime_error("Invalid option use option -h|-help for more info");
         }
         noArg.print();
 
@@ -30,7 +30,7 @@ int main(int argc, char* argv[])
             std::cin >> a >> b >> amount;
         }
 
-        createTableCSV<double>(a, b, amount, {1., 0.5, 0.25}, oneArg.path);
+        createTableCSV<double>(a, b, amount, {1., .5, .25}, functions<double>, oneArg.path);
     }
     catch (std::exception const &ex)
     {

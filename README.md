@@ -15,6 +15,7 @@ git clone "https://github.com/panin300200/Number-methods.git"
 ### Step 2: use cmake
 Install cmake.
 
+
 On windows use this links (guide) :
 ```
 https://aneescraftsmanship.com/how-to-install-and-configure-cmake-in-windows/
@@ -29,13 +30,17 @@ sudo apt-get install cmake
 ```
 ## Step 3: build
 ```
+
 cd Number-methods
 cmake -G "Unix Makefiles"
+
 make
 ```
 ## Step 4: you can move it wherever you want
 ```
+
 mv splain* {comfortable path}
+
 ```
 ## In conclusion:
 You can clear temp:
@@ -43,6 +48,7 @@ You can clear temp:
 cd ../
 rm -r test
 ```
+
 # Documentation
 ```
 splain -help
@@ -89,5 +95,6 @@ Use flags -p|-path {your path}
 ```
 splain -p ~/Downloads
 ```
+
 
 Copyright (C) Komarik Zakhar
